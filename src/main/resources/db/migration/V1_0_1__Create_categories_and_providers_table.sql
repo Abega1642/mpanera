@@ -13,6 +13,6 @@ CREATE TABLE providers
     category_id          UUID REFERENCES categories (id),
     average_rating       DOUBLE PRECISION         DEFAULT 0,
     completed_jobs_count INTEGER                  DEFAULT 0,
-    verified             BOOLEAN                  DEFAULT FALSE,
+    is_verified          BOOLEAN                  DEFAULT FALSE,
     updated_at           TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 )

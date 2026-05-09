@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProviderRepository extends JpaRepository<Provider, UUID> {
   List<Provider> findAllByCategoryId(UUID categoryId);
+
+  List<Provider> findTop5ByCategoryIdOrderByAverageRatingDesc(UUID categoryId);
 }

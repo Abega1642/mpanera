@@ -63,7 +63,7 @@ public class User {
   @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private UserRole role;
 
-  @Column(name = "on_boardking_complete")
+  @Column(name = "on_boarding_complete")
   private boolean onBoardingComplete;
 
   @Column(name = "created_at", insertable = false, updatable = false)
