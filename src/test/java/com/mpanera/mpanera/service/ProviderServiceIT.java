@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class ProviderServiceIT extends FacadeIT {
+public class ProviderServiceIT extends FacadeIT {
   @Autowired private ProviderService subject;
 
   @Autowired private ProviderRepository repository;
