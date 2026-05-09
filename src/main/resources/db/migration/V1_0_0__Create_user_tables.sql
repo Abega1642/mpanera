@@ -6,6 +6,8 @@ CREATE TABLE users (
     username VARCHAR(255),
     first_name VARCHAR(255),
     last_name VARCHAR(255),
+    district VARCHAR(255),
+    city VARCHAR(255),
     email_verified BOOLEAN DEFAULT FALSE,
     on_boarding BOOLEAN DEFAULT FALSE,
     user_role user_role NOT NULL,
