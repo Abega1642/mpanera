@@ -6,8 +6,10 @@ import static org.owasp.encoder.Encode.forJava;
 import com.mpanera.mpanera.InfraGenerated;
 import com.mpanera.mpanera.endpoint.rest.controller.model.ErrorResponse;
 import com.mpanera.mpanera.exception.MissingAuthorizationException;
+import com.svix.exceptions.WebhookVerificationException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import java.io.IOException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -242,6 +244,38 @@ public class ApiExceptionHandler {
             getRequestPath(request),
             "MISSING_AUTHORIZATION");
     return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(WebhookVerificationException.class)
+  public ResponseEntity<ErrorResponse> handleWebhookVerificationException(
+      WebhookVerificationException ex, WebRequest request) {
+
+    log.warn("Webhook signature verification failed at path: {}", forJava(getRequestPath(request)));
+
+    var errorResponse =
+        ErrorResponse.of(
+            HttpStatus.UNAUTHORIZED,
+            "Webhook signature verification failed",
+            getRequestPath(request),
+            "WEBHOOK_VERIFICATION_FAILED");
+    return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(IOException.class)
+  public ResponseEntity<ErrorResponse> handleIOException(IOException ex, WebRequest request) {
+
+    log.warn(
+        "Malformed webhook payload at path: {}, reason: {}",
+        forJava(getRequestPath(request)),
+        forJava(ex.getMessage()));
+
+    var errorResponse =
+        ErrorResponse.of(
+            HttpStatus.BAD_REQUEST,
+            "Malformed webhook payload",
+            getRequestPath(request),
+            "MALFORMED_WEBHOOK_PAYLOAD");
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(Exception.class)
