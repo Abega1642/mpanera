@@ -1,0 +1,296 @@
+openapi: 3.1.0
+info:
+  title: Title of the backend Service
+  description: Description of the Backend service
+  version: 1.0.0
+  contact:
+    name: Your Team name
+    email: your@team.email
+    url: https://your-team-website.com
+servers:
+  - url: https://prod-url.com
+    description: Production environment
+  - url: https://preprod-url.com
+    description: Pre-production environment
+  - url: http://localhost:9090
+    description: Local development environment
+paths:
+  /:
+    get:
+      operationId: addViewControllers
+      tags:
+        - Docs
+      summary: Redirect root path to Swagger UI
+      responses:
+        302:
+          description: Redirects to /doc
+          headers:
+            Location:
+              description: URL to redirect
+              schema:
+                type: string
+                format: uri
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServer'
+  /ping:
+    get:
+      operationId: ping
+      tags:
+        - Health
+      summary: Check if the server is alive
+      responses:
+        200:
+          description: A message showing that the server is alive
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: string
+                example: pong
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServer'
+  /health/db:
+    get:
+      operationId: checkDbHealth
+      summary: Health check for the dummy database
+      description: Returns a paginated list of Dummy entities.
+      tags:
+        - Health
+      parameters:
+        - name: page
+          $ref: '#/components/parameters/Page'
+        - name: size
+          $ref: '#/components/parameters/PageSize'
+      responses:
+        200:
+          description: Successful database health check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DummyPageResponse'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServer'
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 0
+      description: Page number (0-based)
+    PageSize:
+      name: size
+      in: query
+      schema:
+        type: integer
+        default: 10
+      description: Page size
+  schemas:
+    PageResponse:
+      type: object
+      required:
+        - content
+        - pageable
+        - total_elements
+        - total_pages
+        - last
+        - first
+        - size
+        - number
+        - number_of_elements
+        - empty
+      description: 'Paginated response wrapper matching the JSON serialization of org.springframework.data.domain.Page. The pagination metadata is nested under the `pageable` object, consistent with Spring Data defaults.
+
+'
+      properties:
+        content:
+          type: array
+          description: Page content — the list of elements for the current page.
+          items: {}
+        pageable:
+          type: object
+          description: Pagination state used to produce this page.
+          properties:
+            page_number:
+              type: integer
+              description: Zero-based current page index.
+            page_size:
+              type: integer
+              description: Requested number of items per page.
+            offset:
+              type: integer
+              format: int64
+              description: Offset of the first element of this page relative to the full result set.
+            sort:
+              $ref: '#/components/schemas/SortDescriptor'
+            paged:
+              type: boolean
+              description: Whether pagination is applied.
+            unpaged:
+              type: boolean
+              description: Whether pagination is disabled.
+        total_elements:
+          type: integer
+          format: int64
+          description: Total number of elements across all pages.
+        total_pages:
+          type: integer
+          description: Total number of pages available.
+        last:
+          type: boolean
+          description: Whether this is the last page.
+        first:
+          type: boolean
+          description: Whether this is the first page.
+        size:
+          type: integer
+          description: Effective page size (number of elements requested per page).
+        number:
+          type: integer
+          description: Zero-based index of the current page.
+        number_of_elements:
+          type: integer
+          description: Number of elements on the current page.
+        empty:
+          type: boolean
+          description: Whether the current page has no content.
+        sort:
+          $ref: '#/components/schemas/SortDescriptor'
+    SortDescriptor:
+      type: object
+      description: Sort state descriptor returned by Spring Data.
+      properties:
+        empty:
+          type: boolean
+          description: Whether no sort orders are applied.
+        sorted:
+          type: boolean
+          description: Whether at least one sort order is applied.
+        unsorted:
+          type: boolean
+          description: Whether no sort orders are applied (inverse of sorted).
+    DummyPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Dummy'
+    ErrorResponse:
+      type: object
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+        - path
+      description: Standard error response format
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/DateTime'
+        status:
+          type: integer
+          description: HTTP status code
+        error:
+          type: string
+          description: HTTP status reason phrase
+        message:
+          type: string
+          description: Human-readable error description
+        path:
+          type: string
+          description: The relative URI of the request that caused the error.
+          example: /the/current/endpoint
+        error_code:
+          type: string
+          description: Application-specific error code
+          enum:
+            - RESOURCE_NOT_FOUND
+            - ILLEGAL_STATE
+            - SECURITY_EXCEPTION
+            - PAYLOAD_NOT_AS_EXPECTED
+            - EMAIL_HEALTH_CHECK_FAILED
+            - MISSING_REQUIRED_PART
+            - DUPLICATE_EMAIL
+            - DUPLICATE_SUPABASE_ID
+            - DIRECTORY_UPLOAD_FAILED
+            - AUTHORIZATION_DENIED
+            - ENTITY_NOT_FOUND
+            - MISSING_REQUEST_HEADER
+            - MISSING_AUTH_CREDS
+            - BAD_FORM
+            - MISSING_AUTHORIZATION
+            - INTERNAL_SERVER_ERROR
+            - MISSING_REQUIRED_PARAMETER
+            - INVALID_PARAMETER
+            - MALFORMED_JSON
+            - METHOD_NOT_ALLOWED
+        details:
+          type: object
+          description: Additional error context
+    DateTime:
+      type: string
+      format: date-time
+      description: Date and time in ISO 8601 format (RFC 3339)
+      example: '2025-12-06T11:23:45Z'
+    UUID:
+      type: string
+      pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+      format: uuid
+      example: e6b5cc3e-eaaa-4cb3-912c-e059e983bb78
+    Dummy:
+      type: object
+      required:
+        - id
+        - description
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        description:
+          type: string
+  responses:
+    InternalServer:
+      description: Internal Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: Invalid request parameters or payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid authentication credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Insufficient permissions for requested operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Requested resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Resource conflict or duplicate entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
