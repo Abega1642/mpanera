@@ -2,10 +2,13 @@ package com.mpanera.mpanera.repository.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "users")
@@ -45,4 +50,15 @@ public class User {
 
   @Column(name = "last_name")
   private String lastName;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  private UserRole role;
+
+  @Column(name = "on_boardking_complete")
+  private boolean onBoardingComplete;
+
+  @Column(name = "created_at", insertable = false, updatable = false)
+  private LocalDateTime createdAt;
 }

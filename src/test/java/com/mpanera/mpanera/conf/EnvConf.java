@@ -1,6 +1,12 @@
 package com.mpanera.mpanera.conf;
 
+import static java.lang.String.format;
+import static java.util.UUID.randomUUID;
+
 import com.mpanera.mpanera.InfraGenerated;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.UUID;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 
@@ -87,65 +93,19 @@ import org.springframework.test.context.DynamicPropertyRegistry;
  *
  * @see FacadeIT
  * @see DynamicPropertyRegistry
- * @see RabbitMQConf
- * @see BucketConf
- * @see EmailConf
  */
 @InfraGenerated
 @TestConfiguration
 public class EnvConf {
+  public static final UUID JWKS_URI = randomUUID();
+  public static final String CLERK_WEBHOOK_SECRET =
+      format(
+          "whsec_%S",
+          Base64.getEncoder()
+              .encodeToString(randomUUID().toString().getBytes(StandardCharsets.UTF_8)));
 
-  /**
-   * Configures application-specific environment variables and properties for integration testing.
-   *
-   * <p>This method is called by {@link FacadeIT#configureProperties(DynamicPropertyRegistry)}
-   * through reflection after all infrastructure containers have been configured. Use this method to
-   * register any application-level properties that don't belong to specific infrastructure
-   * components.
-   *
-   * <p><b>Implementation guidelines:</b>
-   *
-   * <ul>
-   *   <li>Use descriptive property keys following Spring Boot conventions (e.g., {@code
-   *       app.feature.name})
-   *   <li>Provide lambda suppliers for dynamic values: {@code registry.add("key", () -> "value")}
-   *   <li>Group related properties together with comments for clarity
-   *   <li>Use test-safe values that won't affect external systems
-   *   <li>Document any non-obvious property purposes in comments
-   * </ul>
-   *
-   * <p><b>Example implementation:</b>
-   *
-   * <pre>{@code
-   * @Override
-   * public void configureProperties(DynamicPropertyRegistry registry) {
-   *   // Payment Gateway Configuration
-   *   registry.add("app.payment.stripe.api-key", () -> "sk_test_mock_key");
-   *   registry.add("app.payment.stripe.webhook-secret", () -> "whsec_test_secret");
-   *
-   *   // Authentication & Security
-   *   registry.add("app.security.jwt.secret", () -> "test-jwt-secret-key-min-256-bits");
-   *   registry.add("app.security.jwt.expiration-ms", () -> "3600000");
-   *   registry.add("app.security.cors.allowed-origins", () -> "http://localhost:3000");
-   *
-   *   // External Service Integration
-   *   registry.add("app.external.weather-api.key", () -> "test-api-key");
-   *   registry.add("app.external.weather-api.url", () -> "http://localhost:8081/mock-weather");
-   *
-   *   // Application Behavior
-   *   registry.add("app.cache.ttl-seconds", () -> "300");
-   *   registry.add("app.retry.max-attempts", () -> "3");
-   *   registry.add("app.async.pool-size", () -> "5");
-   * }
-   * }</pre>
-   *
-   * <p>Properties registered here are available throughout the Spring test context and can be
-   * injected using {@code @Value}, {@code @ConfigurationProperties}, or accessed via the {@code
-   * Environment}.
-   *
-   * @param registry the Spring DynamicPropertyRegistry to add properties to
-   */
   public void configureProperties(DynamicPropertyRegistry registry) {
-    // Add your application-specific test properties here
+    registry.add("clerk.jwks-uri", () -> JWKS_URI);
+    registry.add("clerk.webhook-secret", () -> CLERK_WEBHOOK_SECRET);
   }
 }

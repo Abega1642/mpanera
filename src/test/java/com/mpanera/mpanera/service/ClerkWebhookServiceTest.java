@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkEmailAddress;
 import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkEmailVerification;
+import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkPublicMetadata;
 import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkWebhookEvent;
 import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkWebhookUserData;
 import com.mpanera.mpanera.repository.UserRepository;
@@ -135,8 +136,10 @@ class ClerkWebhookServiceTest {
   private ClerkWebhookEvent buildEvent(String type) {
     var verification = new ClerkEmailVerification("verified");
     var email = new ClerkEmailAddress("email_1", "user@example.com", verification);
+    var metadata = new ClerkPublicMetadata("CLIENT");
     var data =
-        new ClerkWebhookUserData("user_123", "johndoe", "John", "Doe", "email_1", List.of(email));
+        new ClerkWebhookUserData(
+            "user_123", "johndoe", "John", "Doe", "email_1", List.of(email), metadata);
     return new ClerkWebhookEvent(type, data);
   }
 

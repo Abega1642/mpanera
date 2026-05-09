@@ -7,6 +7,7 @@ import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkWebhookEvent;
 import com.mpanera.mpanera.endpoint.rest.controller.model.ClerkWebhookUserData;
 import com.mpanera.mpanera.repository.UserRepository;
 import com.mpanera.mpanera.repository.model.User;
+import com.mpanera.mpanera.repository.model.UserRole;
 import com.svix.Webhook;
 import com.svix.exceptions.WebhookVerificationException;
 import jakarta.transaction.Transactional;
@@ -57,6 +58,8 @@ public class ClerkWebhookService {
       return;
     }
 
+    UserRole role = resolveRole(data);
+
     userRepository.save(
         User.builder()
             .clerkId(data.id())
@@ -65,9 +68,20 @@ public class ClerkWebhookService {
             .username(data.username())
             .firstName(data.firstName())
             .lastName(data.lastName())
+            .role(role)
+            .onBoardingComplete(false)
             .build());
+    ;
 
-    log.info("User created from Clerk webhook, clerkId: {}", forJava(data.id()));
+    log.info("User created from Clerk webhook, clerkId: {}, role: {}", forJava(data.id()), role);
+  }
+
+  private UserRole resolveRole(ClerkWebhookUserData data) {
+    if (data.publicMetadata() == null || data.publicMetadata().role() == null)
+      throw new IllegalArgumentException(
+          "Missing role in public_metadata for clerkId: " + data.id());
+
+    return UserRole.valueOf(data.publicMetadata().role().toUpperCase());
   }
 
   private void onUpdate(ClerkWebhookUserData data) {
@@ -80,6 +94,7 @@ public class ClerkWebhookService {
               user.setUsername(data.username());
               user.setFirstName(data.firstName());
               user.setLastName(data.lastName());
+              user.setRole(resolveRole(data));
               log.info("User updated from Clerk webhook, clerkId: {}", forJava(data.id()));
             },
             () -> log.warn("Received user.updated for unknown clerkId: {}", forJava(data.id())));

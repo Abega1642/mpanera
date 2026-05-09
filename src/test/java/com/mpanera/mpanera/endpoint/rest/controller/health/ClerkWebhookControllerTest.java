@@ -8,9 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.mpanera.mpanera.config.ClerkConf;
 import com.mpanera.mpanera.endpoint.rest.controller.ClerkWebhookController;
 import com.mpanera.mpanera.service.ClerkWebhookService;
 import com.mpanera.mpanera.service.util.ServletHttpHeaderExtractor;
+import com.svix.Webhook;
 import com.svix.exceptions.WebhookVerificationException;
 import java.io.IOException;
 import java.net.http.HttpHeaders;
@@ -19,11 +21,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(ClerkWebhookController.class)
+@WebMvcTest(
+    value = ClerkWebhookController.class,
+    excludeFilters =
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ClerkConf.class))
 @AutoConfigureMockMvc(addFilters = false)
 class ClerkWebhookControllerTest {
 
@@ -32,6 +39,8 @@ class ClerkWebhookControllerTest {
   @MockitoBean private ClerkWebhookService clerkWebhookService;
 
   @MockitoBean private ServletHttpHeaderExtractor headerExtractor;
+
+  @MockitoBean private Webhook svixWebhook;
 
   @Test
   void should_return_200_when_request_is_valid() throws Exception {
