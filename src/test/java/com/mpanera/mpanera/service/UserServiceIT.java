@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.mpanera.mpanera.conf.FacadeIT;
 import com.mpanera.mpanera.endpoint.rest.controller.model.UserUpdateRequest;
+import com.mpanera.mpanera.repository.MessageRepository;
 import com.mpanera.mpanera.repository.UserRepository;
 import com.mpanera.mpanera.repository.model.User;
 import com.mpanera.mpanera.repository.model.UserRole;
@@ -16,9 +17,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class UserServiceIT extends FacadeIT {
+public class UserServiceIT extends FacadeIT {
   @Autowired private UserService subject;
   @Autowired private UserRepository repository;
+  @Autowired private MessageRepository messageRepository;
 
   public static User generateTestUser() {
     return User.builder()
@@ -35,6 +37,7 @@ class UserServiceIT extends FacadeIT {
 
   @BeforeEach
   void setUp() {
+    messageRepository.deleteAll();
     repository.deleteAll();
   }
 
