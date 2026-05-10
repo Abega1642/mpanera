@@ -51,7 +51,8 @@ public class SecurityConf {
                     DOC_ENDPOINT + ANY_SUBPATH,
                     SWAGGER_UI_ENDPOINT,
                     V_3_API_DOCS,
-                    V_3_API_DOCS_YAML))
+                    V_3_API_DOCS_YAML,
+                    "/webhooks/clerk"))
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
@@ -71,6 +72,8 @@ public class SecurityConf {
                         SWAGGER_UI_ENDPOINT,
                         V_3_API_DOCS,
                         V_3_API_DOCS_YAML)
+                    .permitAll()
+                    .requestMatchers("/webhooks/clerk")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
