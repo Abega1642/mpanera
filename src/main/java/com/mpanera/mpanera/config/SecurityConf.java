@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -79,10 +80,17 @@ public class SecurityConf {
                     .authenticated())
         .oauth2ResourceServer(
             oauth2 ->
-                oauth2.jwt(
-                    jwt ->
-                        jwt.jwkSetUri(jwksUri)
-                            .jwtAuthenticationConverter(clerkJwtAuthenticationConverter())))
+                oauth2
+                    .jwt(
+                        jwt ->
+                            jwt.jwkSetUri(jwksUri)
+                                .jwtAuthenticationConverter(clerkJwtAuthenticationConverter()))
+                    .bearerTokenResolver(
+                        request -> {
+                          String path = request.getRequestURI();
+                          if (path.equals("/webhooks/clerk")) return null;
+                          return new DefaultBearerTokenResolver().resolve(request);
+                        }))
         .build();
   }
 
