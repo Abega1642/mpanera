@@ -25,9 +25,9 @@ info:
 servers:
   - url: https://prod-url.com
     description: Production environment
-  - url: https://preprod-url.com
+  - url: https://mpanera.onrender.com
     description: Pre-production environment
-  - url: http://localhost:9090
+  - url: http://localhost:8080
     description: Local development environment
 tags:
   - name: Docs
@@ -744,20 +744,20 @@ components:
         username:
           type: string
           nullable: true
-        firstName:
+        first_name:
           type: string
           nullable: true
-        lastName:
+        last_name:
           type: string
           nullable: true
-        primaryEmailAddressId:
+        primary_email_address_id:
           type: string
           nullable: true
-        emailAddresses:
+        email_addresses:
           type: array
           items:
             $ref: '#/components/schemas/ClerkEmailAddress'
-        publicMetadata:
+        public_metadata:
           $ref: '#/components/schemas/ClerkPublicMetadata'
     ClerkWebhookEvent:
       type: object
