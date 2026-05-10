@@ -757,7 +757,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClerkEmailAddress'
-        public_metadata:
+        unsafe_metadata:
           $ref: '#/components/schemas/ClerkPublicMetadata'
     ClerkWebhookEvent:
       type: object
