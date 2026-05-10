@@ -71,17 +71,16 @@ public class ClerkWebhookService {
             .role(role)
             .onBoardingComplete(false)
             .build());
-    ;
 
     log.info("User created from Clerk webhook, clerkId: {}, role: {}", forJava(data.id()), role);
   }
 
   private UserRole resolveRole(ClerkWebhookUserData data) {
-    if (data.publicMetadata() == null || data.publicMetadata().role() == null)
+    if (data.unsafeMetadata() == null || data.unsafeMetadata().role() == null)
       throw new IllegalArgumentException(
-          "Missing role in public_metadata for clerkId: " + data.id());
+          "Missing role in unsafe_metadata for clerkId: " + data.id());
 
-    return UserRole.valueOf(data.publicMetadata().role().toUpperCase());
+    return UserRole.valueOf(data.unsafeMetadata().role().toUpperCase());
   }
 
   private void onUpdate(ClerkWebhookUserData data) {

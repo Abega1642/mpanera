@@ -9,7 +9,7 @@ public record ClerkWebhookUserData(
     String lastName,
     String primaryEmailAddressId,
     List<ClerkEmailAddress> emailAddresses,
-    ClerkPublicMetadata publicMetadata) {
+    ClerkPublicMetadata unsafeMetadata) {
 
   public String resolvePrimaryEmail() {
     return emailAddresses.stream()
